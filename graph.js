@@ -18,7 +18,7 @@ gx = g.append("g")
 gx.call(x_axis);
 gx.attr("transform", "translate(0,400)");
 
-d3.csv("old_discoveries.csv", function(data) {
+d3.csv("data.csv", function(data) {
   g.selectAll("circle")
       .data(data)
     .enter().append("circle")
@@ -27,20 +27,24 @@ d3.csv("old_discoveries.csv", function(data) {
       .attr("r", 10);
 });
 
-function updateDiscoveries() {
-  d3.csv("new_discoveries.csv", function(data) {
+function updateDiscoveries(event) {
+  var targetColumn = this.value;
+  d3.csv("data.csv", function(data) {
     join = g.selectAll("circle")
         .data(data);
 
-    join.attr("cx", function(d) {return x(d["year"]);} )
-        .attr("cy", function(d) {return y(d["important_discoveries"]);} );
+    join.transition().duration(1000).attr("cx", function(d) {return x(d["year"]);} )
+        .attr("cy", function(d) {return y(d[targetColumn]);} )
+        .attr('r', function(d) {return d[targetColumn];});
 
     join.enter().append("circle")
         .attr("cx", function(d) {return x(d["year"]);} )
-        .attr("cy", function(d) {return y(d["important_discoveries"]);} );
+        .attr("cy", function(d) {return y(d[targetColumn]);} );
 
     join.exit().remove();
   });
 }
 
-d3.select("#update_button").on("click", updateDiscoveries);
+// d3.select("#update_button").on("click", updateDiscoveries);
+
+d3.select('#data_choice').on('change', updateDiscoveries);
